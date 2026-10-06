@@ -27,7 +27,9 @@ class TaskController extends Controller
     {
        $task = $project->tasks()->create([
             ...$request->validated(),
+            'user_id' => $request->user()->id,
             'is_done' => false,
+            
         ]);
     
         return response()->json($task, 201);

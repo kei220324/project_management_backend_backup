@@ -40,6 +40,7 @@ class StoreTaskRequest extends FormRequest
                 'completed',
             ]),
         ],
+        'user_id' => ['required', 'integer'],
     ];
     }
 }

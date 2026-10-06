@@ -1,10 +1,12 @@
 <?php
 
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\ProjectController;
 use App\Http\Controllers\Api\TaskController;
 use App\Http\Controllers\TaskCheckItemController;
+use App\Http\Controllers\AuthController;
+use Illuminate\Support\Facades\Route;
+
 
 /*
 |--------------------------------------------------------------------------
@@ -17,38 +19,36 @@ use App\Http\Controllers\TaskCheckItemController;
 |
 */
 
-Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
-    return $request->user();
+// 誰でもアクセスできるAPI
+Route::post('/register', [AuthController::class, 'register']);
+Route::post('/login', [AuthController::class, 'login']);
+
+
+// ログインが必要なAPI
+Route::middleware('auth:sanctum')->group(function () {
+
+    Route::get('/user', function (Request $request) {
+        return $request->user();
+    });
+
+    Route::get('/projects', [ProjectController::class, 'index']);
+    Route::get('/projects/{project}', [ProjectController::class, 'show']);
+    Route::post('/projects', [ProjectController::class, 'store']);
+    Route::delete('/projects/{project}', [ProjectController::class, 'destroy']);
+  
+    Route::put('/projects/{project}', [ProjectController::class, 'update']);
+
+    Route::post('/projects/{project}/tasks', [TaskController::class, 'store']);
+
+    Route::patch('/tasks/{task}/toggle', [TaskController::class, 'toggle']);
+    Route::patch('/tasks/{task}', [TaskController::class, 'update']);
+    Route::delete('/tasks/{task}', [TaskController::class, 'destroy']);
+
+    Route::get('/tasks/{task}/check-items', [TaskCheckItemController::class, 'index']);
+    Route::patch('/tasks/{task}/check-items/{checkItem}', [TaskCheckItemController::class, 'update']);
+    Route::post('/tasks/{task}/check-items', [TaskCheckItemController::class, 'store']);
+    Route::delete('/tasks/{task}/check-items/{checkItem}', [TaskCheckItemController::class, 'destroy']);
 });
-
-Route::get('/projects', [ProjectController::class, 'index']);
-Route::get('/projects/{project}', [ProjectController::class, 'show']);
-Route::delete('/projects/{project}', [ProjectController::class, 'destroy']);
-Route::post('/projects', [ProjectController::class, 'store']);
-Route::put('/projects/{project}', [ProjectController::class, 'update']);
-
-Route::post('/projects/{project}/tasks', [TaskController::class, 'store']);
-Route::patch('/tasks/{task}/toggle', [TaskController::class, 'toggle']);
-Route::patch('/tasks/{task}', [TaskController::class, 'update']);
-Route::get('/tasks/{task}/check-items', [TaskCheckItemController::class, 'index']);
-Route::patch('/tasks/{task}/check-items/{checkItem}', [TaskCheckItemController::class, 'update']);
-Route::post('/tasks/{task}/check-items', [TaskCheckItemController::class, 'store']);
-Route::delete(
-    '/tasks/{task}/check-items/{checkItem}',
-    [TaskCheckItemController::class, 'destroy']
-);
-Route::delete('/tasks/{task}', [TaskController::class, 'destroy']);
-
-
-
-
-
-
-
-
-
-
-
 
 
 

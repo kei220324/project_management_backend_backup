@@ -10,20 +10,35 @@ use App\Http\Requests\UpdateProjectRequest;
 
 class ProjectController extends Controller
 {
-    public function index()
-    {
-        $projects = Project::query()
-            ->select(['id', 'name', 'summary', 'due_date'])
-            ->withTaskStats()
-            ->latest('id')
-            ->get();
 
-        return response()->json($projects);
-    }
+public function index(Request $request)
+{
+    
+    $user = $request->user();
+ 
+
+    $projects = $user->projects()
+        ->select([
+            'projects.id',
+            'projects.name',
+            'projects.summary',
+            'projects.due_date',
+           
+        ])
+        
+        ->withTaskStats()
+        ->latest('projects.id')
+        ->get();
+
+    return response()->json($projects);
+}
+
 
     public function show(Project $project)
     {
+        
         $project->load([
+            'users',
             'tasks' => function ($query) {
                 $query
                     ->select(['id', 'project_id', 'name', 'is_done', 'due_date',"status","description"])
@@ -54,7 +69,15 @@ class ProjectController extends Controller
     }
     public function store(StoreProjectRequest $request)
     {
+        // 現在ログインしているユーザーを取得
+        $user = $request->user();
+    
+        // プロジェクトを作成
         $project = Project::create($request->validated());
+    
+        // プロジェクトを作成したユーザーを
+        // プロジェクトの担当者として登録
+        $user->projects()->attach($project->id);
     
         return response()->json($project, 201);
     }

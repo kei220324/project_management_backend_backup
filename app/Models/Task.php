@@ -14,6 +14,7 @@ class Task extends Model
 
     protected $fillable = [
         'project_id',
+        'user_id',
         'status',
         'name',
         'description',
@@ -33,6 +34,11 @@ class Task extends Model
     {
         return $this->belongsTo(Project::class);
     }
+
+    public function user(): BelongsTo
+{
+    return $this->belongsTo(User::class);
+}
 
     /**
      * このタスクに属しているチェック項目
